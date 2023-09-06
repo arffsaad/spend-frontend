@@ -1,35 +1,50 @@
-import { Spend, columns } from "./columns"
-import { DataTable } from "./datatable"
+"use client";
+import { useState, useEffect } from 'react';
+import { Spend, columns } from './columns';
+import { DataTable } from './datatable';
+import { Button } from '@/components/ui/button';
 
-// dummy data for now
+// Dummy data for now
 async function getData(): Promise<Spend[]> {
-    return [
-        {  
-            id: 1,
-            description: "test1",
-            amount: 5000,
-            wallet: "Grocery",
-            image: "test",
-            fulfilled: "2023-08-09"
-        },
-        {
-            id: 2,
-            description: "test2",
-            amount: 1000,
-            wallet: "Daily",
-            image: "test",
-            fulfilled: "null"
-        }
-    ];
+  const response = await fetch('/api/spending/user/1', {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+
+  const data = await response.json();
+  return data.data;
 }
 
-export default async function Spends() {
+export default function Spends() {
+  const [data, setData] = useState<Spend[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const newData = await getData();
+      setData(newData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const finalFulfill() = async () => {
+    await fetchData();
+  }
+  useEffect(() => {
+    fetchData(); // Fetch data on initial component mount
+  }, []);
 
-    const data = await getData()
-
-    return (
-        <main className="p-24">
-                <DataTable columns={columns} data={data} />
-        </main>
-    );
+  return (
+    <main className="p-24">
+      <Button onClick={fetchData} disabled={isLoading}>
+        {isLoading ? 'Loading...' : 'Reload Data'}
+      </Button>
+      <DataTable columns={columns} data={data} />
+    </main>
+  );
 }

@@ -8,11 +8,12 @@ import { FulfillAlert } from "@/components/ui/fulfill-alert";
 // You can use a Zod schema here if you want.
 export type Spend = {
     id: number;
-    description: string;
+    userid: number;
+    remark: string;
     amount: number;
-    wallet: string;
-    image: string;
-    fulfilled: string;
+    walletid: string;
+    recslug: string;
+    fulfilled_at: string;
 }
 
 export const columns: ColumnDef<Spend>[] = [
@@ -21,11 +22,11 @@ export const columns: ColumnDef<Spend>[] = [
     header: "#",
   },
   {
-    accessorKey: "description",
+    accessorKey: "remark",
     header: "Spending",
   },
   {
-    accessorKey: "wallet",
+    accessorKey: "walletid",
     header: "Source",
   },
   {
@@ -39,13 +40,13 @@ export const columns: ColumnDef<Spend>[] = [
     },
   },
   {
-    accessorKey: "fulfilled",
+    accessorKey: "fulfilled_at",
     header: "Fulfilled On",
     cell: ({ row }) => {
-        const fulfill = String (row.getValue("fulfilled"));
+        const fulfill = String (row.getValue("fulfilled_at"));
         const spendId = Number (row.getValue("id"));
         if (fulfill == "null" || fulfill == null || fulfill == "") {
-            return <FulfillAlert id={spendId} />
+            return <FulfillAlert id={spendId} onFulfill={handleFulfill()}/>
         }
         
         return <div className="text-left font-medium">{fulfill}</div>
