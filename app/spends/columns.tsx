@@ -1,7 +1,6 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { FulfillAlert } from "@/components/ui/fulfill-alert";
 
 
 // This type is used to define the shape of our data.
@@ -44,9 +43,8 @@ export const columns: ColumnDef<Spend>[] = [
     header: "Fulfilled On",
     cell: ({ row }) => {
         const fulfill = String (row.getValue("fulfilled_at"));
-        const spendId = Number (row.getValue("id"));
         if (fulfill == "null" || fulfill == null || fulfill == "") {
-            return <FulfillAlert id={spendId} onFulfill={handleFulfill()}/>
+            return <div className="text-left font-medium">N/A</div>
         }
         
         return <div className="text-left font-medium">{fulfill}</div>

@@ -4,7 +4,7 @@ import { Spend, columns } from './columns';
 import { DataTable } from './datatable';
 import { Button } from '@/components/ui/button';
 
-// Dummy data for now
+
 async function getData(): Promise<Spend[]> {
   const response = await fetch('/api/spending/user/1', {
     method: 'GET',
@@ -32,9 +32,6 @@ export default function Spends() {
       setIsLoading(false);
     }
   };
-  const finalFulfill() = async () => {
-    await fetchData();
-  }
   useEffect(() => {
     fetchData(); // Fetch data on initial component mount
   }, []);
@@ -44,6 +41,8 @@ export default function Spends() {
       <Button onClick={fetchData} disabled={isLoading}>
         {isLoading ? 'Loading...' : 'Reload Data'}
       </Button>
+      <br></br>
+      <br></br>
       <DataTable columns={columns} data={data} />
     </main>
   );
