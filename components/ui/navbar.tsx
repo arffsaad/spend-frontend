@@ -83,10 +83,10 @@ const components: { title: string; href: string; description: string }[] = [
               <NavigationMenuTrigger>Wallets</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  <ListItem href="/reloads" title="Summary">
+                  <ListItem href="/wallets" title="Summary">
                     Get an overview of your funds
                   </ListItem>
-                  <ListItem href="/reloads/create" title="Reload">
+                  <ListItem href="/reloads" title="Reload">
                     Reload your funds
                   </ListItem>
                 </ul>

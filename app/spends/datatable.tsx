@@ -28,6 +28,11 @@ export function DataTable<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
+    initialState: {
+      columnVisibility: {
+        ["id"]: false,
+      }
+    },
     getCoreRowModel: getCoreRowModel(),
   })
 

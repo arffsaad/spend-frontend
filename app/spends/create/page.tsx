@@ -2,8 +2,11 @@
 
 import * as z from "zod"
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { FilePond, registerPlugin } from 'react-filepond';
+import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
 import {
     Form,
     FormControl,
@@ -23,6 +26,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
+import 'filepond/dist/filepond.min.css';
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+
+registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
 
 type wallets = {
     id: number;
@@ -104,14 +111,24 @@ export default function Page() {
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         const vals = new FormData();
-        vals.append("name", values.name);
+        vals.append("remark", values.name);
         vals.append("amount", String(parseFloat(values.amount) * 100));
-        vals.append("wallet", values.wallet);
+        vals.append("walletid", values.wallet);
         vals.append("fulfilled", values.fulfilled.toString());
-        vals.append("image", values.image);
-        vals.forEach((value, key) => {
-            console.log(key, value);
-        });
+        vals.append("receipt", values.image[0]);
+        vals.append("userid", "1")
+        fetch("/api/spending/create", {
+            method: "POST",
+            body: vals,
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+            // redirect to spends page if successful
+            window.location.href = "/spends";
+        }).catch(error => {
+            console.error(error);
+        })
     }
 
 
@@ -196,6 +213,23 @@ export default function Page() {
                                     />
                                 </FormControl>
                             </FormItem>
+                        )}
+                    />
+                    <Controller
+                        name="image"
+                        defaultValue={[]}
+                        render={({ field }) => (
+                            <FilePond
+                                maxFiles={1}
+                                name={"image"}
+                                required={true}
+                                storeAsFile={true}
+                                credits={false}
+                                files={field.value}
+                                onupdatefiles={(fileItems) => {
+                                    field.onChange(fileItems.map(fileItem => fileItem.file));
+                                }}
+                            />
                         )}
                     />
                     <Button type="submit">Submit</Button>

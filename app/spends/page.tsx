@@ -39,7 +39,7 @@ export default function Spends() {
   return (
     <main className="p-24">
       <Button onClick={fetchData} disabled={isLoading}>
-        {isLoading ? 'Loading...' : 'Reload Data'}
+        {isLoading ? 'Loading...' : 'Refresh'}
       </Button>
       <br></br>
       <br></br>

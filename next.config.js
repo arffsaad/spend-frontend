@@ -6,6 +6,10 @@ const nextConfig = {
             source: "/api/:path*",
             destination: "http://localhost:8080/api/v1/:path*",
           },
+          {
+            source: "/cdn/:path*",
+            destination: "http://localhost:9898/spend-bucket/:path*",
+          }
         ];
     },
 }
