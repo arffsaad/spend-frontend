@@ -86,7 +86,7 @@ const components: { title: string; href: string; description: string }[] = [
                   <ListItem href="/wallets" title="Summary">
                     Get an overview of your funds
                   </ListItem>
-                  <ListItem href="/reloads" title="Reload">
+                  <ListItem href="/reload" title="Reload">
                     Reload your funds
                   </ListItem>
                 </ul>

@@ -1,5 +1,5 @@
 "use client"
-
+import Link from 'next/link'
 import { ColumnDef } from "@tanstack/react-table"
 import {
   Dialog,
@@ -32,6 +32,7 @@ export type Spend = {
   remark: string;
   amount: number;
   wallet: string;
+  walletid: number;
   recslug: string;
   fulfilled_at: string;
 }
@@ -60,12 +61,23 @@ export const columns: ColumnDef<Spend>[] = [
     header: "ID"
   },
   {
+    accessorKey: "walletid",
+    header: "Wallet ID"
+  },
+  {
     accessorKey: "remark",
     header: "Spending",
   },
   {
     accessorKey: "wallet",
     header: "Source",
+    cell: ({ row }) => {
+      const wallet = String(row.getValue("wallet"));
+      const id = parseInt(row.getValue("walletid"));
+      return <div className="text-left font-medium">
+        <Link href={"/wallets/" + id}>{wallet}</Link>
+      </div>
+    }
   },
   {
     accessorKey: "amount",

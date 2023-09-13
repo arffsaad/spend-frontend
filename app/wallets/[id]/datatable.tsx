@@ -31,7 +31,6 @@ export function DataTable<TData, TValue>({
     initialState: {
       columnVisibility: {
         ["id"]: false,
-        ["walletid"]: false,
       }
     },
     getCoreRowModel: getCoreRowModel(),
