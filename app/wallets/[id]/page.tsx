@@ -23,6 +23,7 @@ type Wallets = {
     createdtime: string;
     reloads: Reloads[];
     spends: Spend[];
+    unfulfilledAmounts: number;
 }
 
 async function getData(id: number): Promise<Wallets> {
@@ -70,16 +71,26 @@ export default function Wallet({ params }: { params: { id: number } }) {
                     {loading ?
                         <Skeleton className="w-[100px] h-[20px] rounded-full" /> :
                         <CardDescription>
-                            <p className="text-sm">Balance:</p>
-                            {wallet && (
-                                <span className="text-xl font-bold">{"RM " + (wallet.amount / 100).toFixed(2)}</span>
-                            )}
+                            <div className="grid grid-cols-5 sm:grid-cols-3 xs:grid-cols-2 mx-auto justify-center">
+                                <div>
+                                    <p className="text-sm">Balance:</p>
+                                    {wallet && (
+                                        <span className="text-xl font-bold">{"RM " + (wallet.amount / 100).toFixed(2)}</span>
+                                    )}
+                                </div>
+                                <div className={"mx-auto "+ (wallet && wallet.unfulfilledAmounts > 0 ?"text-red-500" : "")}>
+                                    <p className="text-sm">Unfulfilled:</p>
+                                    {wallet && (
+                                        <span className="text-xl font-bold ">{"RM " + (wallet.unfulfilledAmounts / 100).toFixed(2)}</span>
+                                    )}
+                                </div>
+                            </div>
                         </CardDescription>}
 
                 </CardContent>
                 <CardFooter>
                     {loading ? <p></p> :
-                        <Link className={buttonVariants({ variant: "outline" })} href="/reload">Reload</Link>
+                        <Link className={buttonVariants({ variant: "outline" })} href={"/reload/" + wallet?.id}>Reload</Link>
                     }
                 </CardFooter>
 

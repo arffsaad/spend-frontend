@@ -8,7 +8,7 @@ const nextConfig = {
           },
           {
             source: "/cdn/:path*",
-            destination: "http://localhost:9898/spend-bucket/:path*",
+            destination: "http://localhost:9000/spend-bucket/:path*",
           }
         ];
     },

@@ -115,7 +115,7 @@ export default function Page() {
         vals.append("amount", String(parseFloat(values.amount) * 100));
         vals.append("walletid", values.wallet);
         vals.append("fulfilled", values.fulfilled.toString());
-        vals.append("receipt", values.image[0]);
+        (values.image) ? vals.append("receipt", values.image[0]) : vals.append("receipt", "none");
         vals.append("userid", "1")
         fetch("/api/spending/create", {
             method: "POST",
@@ -222,7 +222,7 @@ export default function Page() {
                             <FilePond
                                 maxFiles={1}
                                 name={"image"}
-                                required={true}
+                                required={false}
                                 storeAsFile={true}
                                 credits={false}
                                 files={field.value}

@@ -1,5 +1,8 @@
 "use client";
 import { Skeleton } from "@/components/ui/skeleton"
+import { AiFillPlusCircle } from "react-icons/ai"
+import { FaWallet } from "react-icons/fa";
+import { BsPlusCircle } from "react-icons/bs";
 import Link from "next/link"
 import {
     Card,
@@ -89,7 +92,7 @@ export default function Reloads() {
                             </Card>
                         </>
                     )
-                        : 
+                        :
                         (
                             walletData.map(walletItem => (
                                 <Link href={"/wallets/" + walletItem.id}>
@@ -102,12 +105,23 @@ export default function Reloads() {
                                             <span className="text-xl font-bold">{"RM" + (walletItem.amount / 100).toFixed(2)}</span>
                                         </CardContent>
                                         <CardFooter>
-
                                         </CardFooter>
                                     </Card>
                                 </Link>
                             )))
+
                 }
+                <Link href="/wallets/create">
+                    <Card className="hover:shadow-xl transition duration-300 group">
+                        <CardHeader>
+                            <p className="font-medium text-5xl mx-auto pt-5 grid grid-cols-3"><BsPlusCircle className="scale-0 group-hover:scale-100 transition duration-300"/><AiFillPlusCircle className="group-hover:scale-0 transition duration-300 col-start-2"/><FaWallet className="scale-0 group-hover:scale-100 transition duration-300 col-start-3"/></p>
+                            <p className="font-semibold mx-auto">Create new Wallet</p>
+                        </CardHeader>
+                        <CardFooter>
+                            
+                        </CardFooter>
+                    </Card>
+                </Link>
             </div>
         </main>
     );
