@@ -1,9 +1,10 @@
-import './globals.css'
+import '../globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { Navbar } from '@/components/ui/navbar'
-import { AuthBar } from '@/components/ui/authbar'
-import { Toaster } from '@/components/ui/toaster'
+import { buttonVariants } from '@/components/ui/button'
+import Image from 'next/image'
+import Link from 'next/link'
+import { cn } from '@/lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,15 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="grid grid-cols-2 z-100 sticky top-0">
-          <Navbar />
-          <div className="ml-auto static">
-            <AuthBar />
+        <div className="bg-black h-screen w-screen flex">
+          <div className="m-auto w-4/12">
+            {children}
           </div>
         </div>
-        {children}
-        <Toaster />
-      </body>
-    </html>
+    </body>
+    </html >
   )
 }

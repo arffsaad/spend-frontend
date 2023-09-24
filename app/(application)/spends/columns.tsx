@@ -70,7 +70,7 @@ export const columns: ColumnDef<Spend>[] = [
   },
   {
     accessorKey: "wallet",
-    header: "Source",
+    header: "Wallet",
     cell: ({ row }) => {
       const wallet = String(row.getValue("wallet"));
       const id = parseInt(row.getValue("walletid"));

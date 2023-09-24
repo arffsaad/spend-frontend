@@ -29,8 +29,8 @@ export function AuthBar() {
           </div>
           <div>
             <div className="grid grid-cols-3">
-              <Button variant="secondary">Sign in</Button>
-              <Button className="col-start-3">Register</Button>
+              <Link href="/auth/login"><Button variant="secondary">Sign in</Button></Link>
+              <Link href="/auth/register"><Button className="col-start-3">Register</Button></Link>
             </div>
             </div>
           </div>
