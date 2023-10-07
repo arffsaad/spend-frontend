@@ -13,6 +13,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { useState, useEffect } from "react";
+import useUserStore from "@/components/userStore";
 type wallets = {
     id: number;
     name: string;
@@ -22,12 +23,15 @@ type wallets = {
 }
 
 async function fetchWallets(): Promise<wallets[]> {
-    const response = await fetch('/api/wallets/user/1', {
+    const response = await fetch('/api/wallets/user', {
         method: 'GET',
+        headers : {
+            "Token" : useUserStore.getState().token
+        }
     });
 
-    if (!response.ok) {
-        throw new Error(response.statusText);
+    if (response.status == 401) {
+        window.location.href = "/auth/login";
     }
 
     const data = await response.json();
@@ -95,7 +99,7 @@ export default function Reloads() {
                         :
                         (
                             walletData.map(walletItem => (
-                                <Link href={"/wallets/" + walletItem.id}>
+                                <Link href={"/app/wallets/" + walletItem.id}>
                                     <Card className="hover:shadow-xl transition duration-300">
                                         <CardHeader>
                                             <CardTitle className="text-xl text-heavy">{walletItem.name}</CardTitle>
@@ -109,9 +113,9 @@ export default function Reloads() {
                                     </Card>
                                 </Link>
                             )))
-
                 }
-                <Link href="/wallets/create">
+                { loading ? (<></>) : (<>
+                <Link href="/app/wallets/create">
                     <Card className="hover:shadow-xl transition duration-300 group">
                         <CardHeader>
                             <p className="font-medium text-5xl mx-auto pt-5 grid grid-cols-3"><BsPlusCircle className="scale-0 group-hover:scale-100 transition duration-300"/><AiFillPlusCircle className="group-hover:scale-0 transition duration-300 col-start-2"/><FaWallet className="scale-0 group-hover:scale-100 transition duration-300 col-start-3"/></p>
@@ -122,6 +126,8 @@ export default function Reloads() {
                         </CardFooter>
                     </Card>
                 </Link>
+                </>)}
+                
             </div>
         </main>
     );

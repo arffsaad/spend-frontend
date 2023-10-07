@@ -3,16 +3,20 @@ import { useState, useEffect } from 'react';
 import { Spend, columns } from './columns';
 import { DataTable } from './datatable';
 import { Button } from '@/components/ui/button';
+import useUserStore from '@/components/userStore';
 
 
 async function getData(): Promise<Spend[]> {
-  const response = await fetch('/api/spending/user/1', {
+  const response = await fetch('/api/spending/user', {
     method: 'GET',
+    headers: {
+      "Token" : useUserStore.getState().token
+    }
   });
 
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
+  if (response.status == 401) {
+    window.location.href = "/auth/login";
+}
 
   const data = await response.json();
   return data.data;

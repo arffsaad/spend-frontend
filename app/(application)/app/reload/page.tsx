@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import useUserStore from "@/components/userStore";
 
 type wallets = {
     id: number;
@@ -51,15 +52,24 @@ const formSchema = z.object({
             }
         }),
     wallet: z.string()
+        .refine(async (value) => {
+            const val = parseInt(value);
+            const wallets = await fetchWallets();
+            const walletIds = wallets.map(wallet => wallet.id);
+            return walletIds.includes(val);
+        }, { message: "Wallet does not exist" }),
 })
 
-async function fetchWallets(id : number): Promise<wallets> {
-    const response = await fetch('/api/wallets/' + id, {
+async function fetchWallets(): Promise<wallets[]> {
+    const response = await fetch('/api/wallets/user', {
         method: 'GET',
+        headers: {
+            "Token" : useUserStore.getState().token
+        }
     });
 
-    if (!response.ok) {
-        throw new Error(response.statusText);
+    if (response.status == 401) {
+        window.location.href = "/auth/login";
     }
 
     const data = await response.json();
@@ -67,15 +77,15 @@ async function fetchWallets(id : number): Promise<wallets> {
 }
 
 
-export default function Page({ params }: { params: { id: number } }) {
-    const [walletData, setData] = useState<wallets>();
+export default function Page() {
+    const [walletData, setData] = useState<wallets[]>([]);
     const fetchData = async () => {
         try {
-            const newData = await fetchWallets(params.id);
+            const newData = await fetchWallets();
             console.log(newData);
             setData(newData);
         } catch (error) {
-            window.location.href = "/reload";
+            console.error('Error fetching data:', error);
         }
     };
     useEffect(() => {
@@ -87,7 +97,7 @@ export default function Page({ params }: { params: { id: number } }) {
         defaultValues: {
             name: "Salary",
             amount: "10.00",
-            wallet: walletData ? (walletData?.id).toString() : "0"
+            wallet: "0"
         },
     })
 
@@ -95,21 +105,22 @@ export default function Page({ params }: { params: { id: number } }) {
         const vals = {
             remark: values.name,
             amount: parseFloat(values.amount) * 100,
-            walletid: walletData?.id,
+            walletid: parseInt(values.wallet),
             userid: 1
         }
         fetch("/api/reloads/create", {
             method: "POST",
             body: JSON.stringify(vals),
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Token" : useUserStore.getState().token
             }
         }).then(response => {
-            if (!response.ok) {
-                throw new Error(response.statusText);
+            if (response.status == 401) {
+                window.location.href = "/auth/login";
             }
             // redirect to spends page if successful
-            window.location.href = "/wallets/" + values.wallet;
+            window.location.href = "/app/wallets/" + values.wallet;
         }).catch(error => {
             console.error(error);
         })
@@ -142,9 +153,20 @@ export default function Page({ params }: { params: { id: number } }) {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Wallet</FormLabel>
-                                <FormControl>
-                                    <Input disabled value={(walletData?.name.toString())} />
-                                </FormControl>
+                                <Select onValueChange={field.onChange}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Wallet" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {walletData.map(walletItem => (
+                                            <SelectItem key={walletItem.id} value={walletItem.id.toString()}>
+                                                {walletItem.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                                 <FormDescription>
                                     Select a wallet to add funds to
                                 </FormDescription>

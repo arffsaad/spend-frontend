@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import useUserStore from "@/components/userStore";
 
 const formSchema = z.object({
     name: z.string()
@@ -57,14 +58,15 @@ export default function Page() {
             method: "POST",
             body: JSON.stringify(vals),
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Token" : useUserStore.getState().token
             }
         }).then(response => {
-            if (!response.ok) {
-                throw new Error(response.statusText);
+            if (response.status == 401) {
+                window.location.href = "/auth/login";
             }
             // redirect to spends page if successful
-            window.location.href = "/wallets";
+            window.location.href = "/app/wallets";
         }).catch(error => {
             console.error(error);
         })

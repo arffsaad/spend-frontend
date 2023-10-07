@@ -4,6 +4,9 @@ import * as z from "zod"
 import { useEffect, useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { FilePond, registerPlugin } from 'react-filepond';
+import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
 import {
     Form,
     FormControl,
@@ -22,6 +25,12 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
+import 'filepond/dist/filepond.min.css';
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+import useUserStore from "@/components/userStore";
+
+registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
 
 type wallets = {
     id: number;
@@ -57,15 +66,20 @@ const formSchema = z.object({
             const walletIds = wallets.map(wallet => wallet.id);
             return walletIds.includes(val);
         }, { message: "Wallet does not exist" }),
+    fulfilled: z.boolean(),
+    image: z.any()
 })
 
 async function fetchWallets(): Promise<wallets[]> {
-    const response = await fetch('/api/wallets/user/1', {
+    const response = await fetch('/api/wallets/user', {
         method: 'GET',
+        headers : {
+            "Token" : useUserStore.getState().token
+        }
     });
 
-    if (!response.ok) {
-        throw new Error(response.statusText);
+    if (response.status == 401) {
+        window.location.href = "/auth/login";
     }
 
     const data = await response.json();
@@ -91,31 +105,34 @@ export default function Page() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "Salary",
+            name: "Dinner!",
             amount: "10.00",
+            fulfilled: false,
+            image: null,
             wallet: "0"
         },
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        const vals = {
-            remark: values.name,
-            amount: parseFloat(values.amount) * 100,
-            walletid: parseInt(values.wallet),
-            userid: 1
-        }
-        fetch("/api/reloads/create", {
+        const vals = new FormData();
+        vals.append("remark", values.name);
+        vals.append("amount", String(parseFloat(values.amount) * 100));
+        vals.append("walletid", values.wallet);
+        vals.append("fulfilled", values.fulfilled.toString());
+        (values.image) ? vals.append("receipt", values.image[0]) : vals.append("receipt", "none");
+        vals.append("userid", "1")
+        fetch("/api/spending/create", {
             method: "POST",
-            body: JSON.stringify(vals),
+            body: vals,
             headers: {
-                "Content-Type": "application/json"
+                "Token": useUserStore.getState().token
             }
         }).then(response => {
-            if (!response.ok) {
-                throw new Error(response.statusText);
+            if (response.status == 401) {
+                window.location.href = "/auth/login";
             }
             // redirect to spends page if successful
-            window.location.href = "/wallets/" + values.wallet;
+            window.location.href = "/app/spends";
         }).catch(error => {
             console.error(error);
         })
@@ -125,7 +142,23 @@ export default function Page() {
     return (
         <main className="p-24">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8" encType="multipart/form-data">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Spending</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Food" {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                    A simple spending description (max 15 characters)
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                     <FormField
                         control={form.control}
                         name="amount"
@@ -136,7 +169,7 @@ export default function Page() {
                                     <Input type="number" placeholder="10.00" {...field} />
                                 </FormControl>
                                 <FormDescription>
-                                    Amount to reload
+                                    Amount Spent
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
@@ -163,7 +196,7 @@ export default function Page() {
                                     </SelectContent>
                                 </Select>
                                 <FormDescription>
-                                    Select a wallet to add funds to
+                                    Select a wallet to deduct funds from
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
@@ -171,21 +204,42 @@ export default function Page() {
                     />
                     <FormField
                         control={form.control}
-                        name="name"
+                        name="fulfilled"
                         render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Remarks</FormLabel>
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                <div className="space-y-0.5">
+                                    <FormLabel>Spending Fulfilled</FormLabel>
+                                    <FormDescription>
+                                        Spending is funded and fulfilled.
+                                    </FormDescription>
+                                </div>
                                 <FormControl>
-                                    <Input placeholder="Food" {...field} />
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
                                 </FormControl>
-                                <FormDescription>
-                                    Optional remarks for this reload (max 15 characters)
-                                </FormDescription>
-                                <FormMessage />
                             </FormItem>
                         )}
                     />
-                    <Button type="submit">Reload</Button>
+                    <Controller
+                        name="image"
+                        defaultValue={[]}
+                        render={({ field }) => (
+                            <FilePond
+                                maxFiles={1}
+                                name={"image"}
+                                required={false}
+                                storeAsFile={true}
+                                credits={false}
+                                files={field.value}
+                                onupdatefiles={(fileItems) => {
+                                    field.onChange(fileItems.map(fileItem => fileItem.file));
+                                }}
+                            />
+                        )}
+                    />
+                    <Button type="submit">Submit</Button>
                 </form>
             </Form>
         </main>

@@ -22,6 +22,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useState } from "react"
+import useUserStore from '@/components/userStore'
 
 
 // This type is used to define the shape of our data.
@@ -39,20 +40,26 @@ export type Spend = {
 
 async function fulfillSpend(id: number) {
   const response = await fetch("/api/spending/fulfill/" + id, {
-    method: "POST"
+    method: "POST",
+    headers : {
+      "Token" : useUserStore.getState().token
+    }
   });
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
+  if (response.status == 401) {
+    window.location.href = "/auth/login";
+}
 }
 
 async function reverseSpend(id: number) {
   const response = await fetch("/api/spending/reverse/" + id, {
-    method: "POST"
+    method: "POST",
+    headers: {
+      "Token" : useUserStore.getState().token
+    }
   });
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
+  if (response.status == 401) {
+        window.location.href = "/auth/login";
+    }
 }
 
 export const columns: ColumnDef<Spend>[] = [
@@ -75,7 +82,7 @@ export const columns: ColumnDef<Spend>[] = [
       const wallet = String(row.getValue("wallet"));
       const id = parseInt(row.getValue("walletid"));
       return <div className="text-left font-medium">
-        <Link href={"/wallets/" + id}>{wallet}</Link>
+        <Link href={"/app/wallets/" + id}>{wallet}</Link>
       </div>
     }
   },
@@ -131,7 +138,7 @@ export const columns: ColumnDef<Spend>[] = [
               <AlertDialogHeader>
                 <AlertDialogTitle>Fullfill this spending?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This basically means you have set aside funds for this spending, making it ready for the statement.
+                  This will deduct the amount from the wallet
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -143,7 +150,15 @@ export const columns: ColumnDef<Spend>[] = [
         </div>
       }
 
-      return <div className="text-left font-medium">
+      // check if fulfill is more than 8 hours
+      const now = new Date();
+      const fulfillDate = new Date(fulfill);
+      const diff = Math.abs(now.getTime() - fulfillDate.getTime());
+      const hours = Math.floor(diff / 1000 / 60 / 60);
+      if (hours > 8) {
+        return <></>
+      }
+      return (<div className="text-left font-medium">
         <AlertDialog>
           <AlertDialogTrigger>Reverse</AlertDialogTrigger>
           <AlertDialogContent>
@@ -159,7 +174,7 @@ export const columns: ColumnDef<Spend>[] = [
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
+      </div>)
     }
   },
   {

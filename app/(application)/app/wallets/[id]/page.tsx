@@ -14,6 +14,7 @@ import { DataTable } from "./datatable";
 import { Reloads, reloadColumns } from "./reloadscolumns";
 import { Spend, spendColumns } from "./spendcolumns";
 import { useState, useEffect } from "react";
+import useUserStore from '@/components/userStore';
 
 type Wallets = {
     id: number;
@@ -29,10 +30,13 @@ type Wallets = {
 async function getData(id: number): Promise<Wallets> {
     const response = await fetch('/api/wallets/' + id, {
         method: 'GET',
+        headers : {
+            "Token" : useUserStore.getState().token
+        }
     });
 
-    if (!response.ok) {
-        throw new Error(response.statusText);
+    if (response.status == 401) {
+        window.location.href = "/auth/login";
     }
 
     const data = await response.json();
@@ -90,7 +94,7 @@ export default function Wallet({ params }: { params: { id: number } }) {
                 </CardContent>
                 <CardFooter>
                     {loading ? <p></p> :
-                        <Link className={buttonVariants({ variant: "outline" })} href={"/reload/" + wallet?.id}>Reload</Link>
+                        <Link className={buttonVariants({ variant: "outline" })} href={"/app/reload/" + wallet?.id}>Reload</Link>
                     }
                 </CardFooter>
 

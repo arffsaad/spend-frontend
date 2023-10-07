@@ -22,6 +22,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useState } from "react"
+import useUserStore from "@/components/userStore"
 
 
 // This type is used to define the shape of our data.
@@ -38,20 +39,26 @@ export type Spend = {
 
 async function fulfillSpend(id: number) {
   const response = await fetch("/api/spending/fulfill/" + id, {
-    method: "POST"
+    method: "POST",
+    headers: {
+      "Token" : useUserStore.getState().token
+    }
   });
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
+  if (response.status == 401) {
+    window.location.href = "/auth/login";
+}
 }
 
 async function reverseSpend(id: number) {
   const response = await fetch("/api/spending/reverse/" + id, {
-    method: "POST"
+    method: "POST",
+    headers : {
+      "Token" : useUserStore.getState().token
+    }
   });
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
+  if (response.status == 401) {
+    window.location.href = "/auth/login";
+}
 }
 
 export const spendColumns: ColumnDef<Spend>[] = [

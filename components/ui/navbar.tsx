@@ -32,10 +32,10 @@ import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
               <NavigationMenuTrigger>Spendings</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  <ListItem href="/spends" title="Summary">
+                  <ListItem href="/app/spends" title="Summary">
                     Get a summary of your spendings
                   </ListItem>
-                  <ListItem href="/spends/create" title="Add Spending">
+                  <ListItem href="/app/spends/create" title="Add Spending">
                     Track a new spending
                   </ListItem>
                 </ul>
@@ -45,10 +45,10 @@ import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
               <NavigationMenuTrigger>Wallets</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  <ListItem href="/wallets" title="Summary">
+                  <ListItem href="/app/wallets" title="Summary">
                     Get an overview of your funds
                   </ListItem>
-                  <ListItem href="/reload" title="Reload">
+                  <ListItem href="/app/reload" title="Reload">
                     Reload your funds
                   </ListItem>
                 </ul>

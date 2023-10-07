@@ -1,5 +1,6 @@
+"use client";
 import { create } from 'zustand'
-
+import { persist, createJSONStorage } from 'zustand/middleware'
 export interface UserState {
   user: string
   token: string
@@ -10,32 +11,47 @@ export interface UserState {
   setId: (id: number) => void
   setEmail: (email: string) => void
   resetUser: () => void
-  resetToken: () => void
-  resetId: () => void
-  resetEmail: () => void
 }
 
-export const useUserStore = create<UserState>()((set) => ({
-  user: "undefined",
-  token: "undefined",
-  id: 0,
-  email: "undefined",
-  setUser: (user: string) => set({ user }),
-  setToken: (token: string) => set({ token }),
-  setId: (id: number) => set({ id }),
-  setEmail: (email: string) => set({ email }),
-  resetUser: () => set({ user: "undefined" }),
-  resetToken: () => set({ token: "undefined" }),
-  resetId: () => set({ id: 0 }),
-  resetEmail: () => set({ email: "undefined" }),
-}))
+export type User = {
+  user: string
+  token: string
+  id: number
+  email: string
+}
 
-export function setLoggedInUser(UserState: UserState) {
+const useUserStore = create<UserState>()(
+  persist(
+    (set) => ({
+      user: '',
+      token: '',
+      id: 0,
+      email: '',
+      setUser: (user: string) => set({ user }),
+      setToken: (token: string) => set({ token }),
+      setId: (id: number) => set({ id }),
+      setEmail: (email: string) => set({ email }),
+      resetUser: () => set({ user: '', token: '', id: 0, email: '' }),
+    }),
+    {
+      name: "userInfo",
+      storage: createJSONStorage(() => sessionStorage)
+    }
+  )
+);
+
+export function setLoggedInUser(UserState: User) {
   useUserStore.setState(UserState)
 }
 
 export function getLoggedInUser() {
-  return useUserStore.getState()
+  const userState = {
+    user: useUserStore.getState().user,
+    token: useUserStore.getState().token,
+    id: useUserStore.getState().id,
+    email: useUserStore.getState().email
+  }
+  return userState;
 }
 
 export function resetLoggedInUser() {
@@ -44,3 +60,5 @@ export function resetLoggedInUser() {
   useUserStore((state) => state.setUser("undefined"))
   useUserStore((state) => state.setToken("undefined"))
 }
+
+export default useUserStore;

@@ -2,6 +2,7 @@
 
 import * as z from "zod"
 import React from "react"
+import Link from "next/link"
 import { set, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CheckBadge } from "@/components/ui/checkbadge"
@@ -61,12 +62,36 @@ export default function register() {
             name: "",
         }
     })
+
+    function onSubmit(values: z.infer<typeof formSchema>) {
+        const vals = {
+            name: values.name,
+            email: values.email,
+            password: values.password,
+        }
+        fetch("/api/auth/register", {
+            method: "POST",
+            body: JSON.stringify(vals),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+            // redirect to spends page if successful
+            window.location.href = "/auth/login";
+        }).catch(error => {
+            console.error(error);
+        })
+    }
+
     async function validateName() {
         setValidName(false);
         if (form.getValues("name") != username && form.getValues("name") != undefined && form.getValues("name") != "" && form.getValues("name").length > 3) {
             console.log('changed')
             setUsername(form.getValues("name"))
-            const response = await fetch("/api/users/check", {
+            const response = await fetch("/api/auth/check", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -96,7 +121,7 @@ export default function register() {
                     <CardDescription>Create your account.</CardDescription>
                 </CardHeader>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(validateName)} className="space-y-8">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                         <CardContent>
 
                             <FormField
@@ -175,6 +200,9 @@ export default function register() {
                     </form>
                 </Form>
             </Card>
+            <div className="flex">
+                <p className="text-white text-xs mt-5 mx-auto"><>Have an account? <Link href="/auth/login" ><u>Sign in.</u></Link></></p>
+            </div>
         </main>
     );
 }
