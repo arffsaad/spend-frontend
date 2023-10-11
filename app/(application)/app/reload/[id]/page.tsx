@@ -2,6 +2,7 @@
 
 import * as z from "zod"
 import { useEffect, useState } from "react"
+import { App } from '@/components/authCheck';
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -23,6 +24,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import useUserStore from "@/components/userStore";
+import useStore from "@/components/useStore";
+import useMsgStore from "@/components/msgStore";
 
 type wallets = {
     id: number;
@@ -63,7 +66,7 @@ async function fetchWallets(id : number): Promise<wallets> {
     });
 
     if (response.status == 401) {
-        window.location.href = "/auth/login";
+        useStore(useUserStore, (state) => state.resetUser());
     }
 
     const data = await response.json();
@@ -72,7 +75,8 @@ async function fetchWallets(id : number): Promise<wallets> {
 
 
 export default function Page({ params }: { params: { id: number } }) {
-    const [walletData, setData] = useState<wallets>();
+  const [authed, setAuthed] = useState<boolean>(false);
+  const [walletData, setData] = useState<wallets>();
     const fetchData = async () => {
         try {
             const newData = await fetchWallets(params.id);
@@ -82,7 +86,17 @@ export default function Page({ params }: { params: { id: number } }) {
             window.location.href = "/app/reload";
         }
     };
+    const checkAuth = async () => {
+        const authed = await App();
+        setAuthed(authed);
+        if (!authed) {
+          useUserStore.getState().resetUser();
+          useMsgStore.setState({ loginPage: "Please login to continue" });
+          window.location.href = "/auth/login";
+        }
+    }
     useEffect(() => {
+        checkAuth();
         fetchData(); // Fetch data on initial component mount
     }, []);
 
@@ -111,7 +125,7 @@ export default function Page({ params }: { params: { id: number } }) {
             }
         }).then(response => {
             if (response.status == 401) {
-                window.location.href = "/auth/login";
+                useStore(useUserStore, (state) => state.resetUser());
             }
             // redirect to spends page if successful
             window.location.href = "/app/wallets/" + walletData?.id;

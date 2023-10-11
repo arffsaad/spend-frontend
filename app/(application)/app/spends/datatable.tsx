@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-
+import Link from "next/link"
 import {
   Table,
   TableBody,
@@ -19,11 +19,13 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  hasWallets: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  hasWallets
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -75,7 +77,7 @@ export function DataTable<TData, TValue>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                { hasWallets ? "No Spending Data" : (<><Link href="/app/wallets/create"><u>Create</u></Link> your wallet to start!</>)}
               </TableCell>
             </TableRow>
           )}

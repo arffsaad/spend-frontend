@@ -4,6 +4,7 @@ import * as z from "zod"
 import { useEffect, useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { App } from '@/components/authCheck';
 import { FilePond, registerPlugin } from 'react-filepond';
 import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
@@ -29,6 +30,8 @@ import { Switch } from "@/components/ui/switch"
 import 'filepond/dist/filepond.min.css';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 import useUserStore from "@/components/userStore";
+import useStore from "@/components/useStore";
+import useMsgStore from "@/components/msgStore";
 
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
 
@@ -79,7 +82,7 @@ async function fetchWallets(): Promise<wallets[]> {
     });
 
     if (response.status == 401) {
-        window.location.href = "/auth/login";
+        useStore(useUserStore, (state) => state.resetUser());
     }
 
     const data = await response.json();
@@ -88,6 +91,7 @@ async function fetchWallets(): Promise<wallets[]> {
 
 
 export default function Page() {
+    const [authed, setAuthed] = useState<boolean>(false);
     const [walletData, setData] = useState<wallets[]>([]);
     const fetchData = async () => {
         try {
@@ -98,7 +102,17 @@ export default function Page() {
             console.error('Error fetching data:', error);
         }
     };
+    const checkAuth = async () => {
+        const authed = await App();
+        setAuthed(authed);
+        if (!authed) {
+          useUserStore.getState().resetUser();
+          useMsgStore.setState({ loginPage: "Please login to continue" });
+          window.location.href = "/auth/login";
+        }
+    }
     useEffect(() => {
+        checkAuth();
         fetchData(); // Fetch data on initial component mount
     }, []);
 
@@ -129,7 +143,7 @@ export default function Page() {
             }
         }).then(response => {
             if (response.status == 401) {
-                window.location.href = "/auth/login";
+                useStore(useUserStore, (state) => state.resetUser());
             }
             // redirect to spends page if successful
             window.location.href = "/app/spends";

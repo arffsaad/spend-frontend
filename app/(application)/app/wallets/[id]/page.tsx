@@ -10,11 +10,14 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { buttonVariants } from "@/components/ui/button"
+import { App } from '@/components/authCheck';
 import { DataTable } from "./datatable";
 import { Reloads, reloadColumns } from "./reloadscolumns";
 import { Spend, spendColumns } from "./spendcolumns";
 import { useState, useEffect } from "react";
 import useUserStore from '@/components/userStore';
+import useStore from '@/components/useStore';
+import useMsgStore from '@/components/msgStore';
 
 type Wallets = {
     id: number;
@@ -36,7 +39,7 @@ async function getData(id: number): Promise<Wallets> {
     });
 
     if (response.status == 401) {
-        window.location.href = "/auth/login";
+        useStore(useUserStore, (state) => state.resetUser());
     }
 
     const data = await response.json();
@@ -45,7 +48,8 @@ async function getData(id: number): Promise<Wallets> {
 
 export default function Wallet({ params }: { params: { id: number } }) {
     const [loading, setLoading] = useState<boolean>(true);
-    const [wallet, setWallet] = useState<Wallets>();
+  const [authed, setAuthed] = useState<boolean>(false);
+  const [wallet, setWallet] = useState<Wallets>();
     const [reload, setReload] = useState<Reloads[]>([]);
     const [spend, setSpend] = useState<Spend[]>([]);
     const fetchData = async () => {
@@ -59,7 +63,17 @@ export default function Wallet({ params }: { params: { id: number } }) {
             console.error('Error fetching data:', error);
         }
     };
+    const checkAuth = async () => {
+        const authed = await App();
+        setAuthed(authed);
+        if (!authed) {
+          useUserStore.getState().resetUser();
+          useMsgStore.setState({ loginPage: "Please login to continue" });
+          window.location.href = "/auth/login";
+        }
+    }
     useEffect(() => {
+        checkAuth();
         fetchData(); // Fetch data on initial component mount
         setLoading(false);
     }, []);
@@ -94,17 +108,17 @@ export default function Wallet({ params }: { params: { id: number } }) {
                 </CardContent>
                 <CardFooter>
                     {loading ? <p></p> :
-                        <Link className={buttonVariants({ variant: "outline" })} href={"/app/reload/" + wallet?.id}>Reload</Link>
+                        <Link className={buttonVariants({ variant: "outline" })} href={"/app/reload/" + wallet?.id}>Top up</Link>
                     }
                 </CardFooter>
 
             </Card>
             <br></br>
-            <h1 className="text-xl font-bold">Last 5 Spends</h1>
+            <h1 className="text-xl font-bold">Recent Spends</h1>
             <br></br>
             <DataTable columns={spendColumns} data={spend} />
             <br></br>
-            <h1 className="text-xl font-bold">Last 5 Reloads</h1>
+            <h1 className="text-xl font-bold">Recent Reloads</h1>
             <br></br>
             <DataTable columns={reloadColumns} data={reload} />
         </main>

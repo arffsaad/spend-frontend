@@ -2,6 +2,7 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { AiFillPlusCircle } from "react-icons/ai"
 import { FaWallet } from "react-icons/fa";
+import { App } from '@/components/authCheck';
 import { BsPlusCircle } from "react-icons/bs";
 import Link from "next/link"
 import {
@@ -14,6 +15,8 @@ import {
 } from "@/components/ui/card"
 import { useState, useEffect } from "react";
 import useUserStore from "@/components/userStore";
+import useStore from "@/components/useStore";
+import useMsgStore from "@/components/msgStore";
 type wallets = {
     id: number;
     name: string;
@@ -31,7 +34,7 @@ async function fetchWallets(): Promise<wallets[]> {
     });
 
     if (response.status == 401) {
-        window.location.href = "/auth/login";
+        useStore(useUserStore, (state) => state.resetUser());
     }
 
     const data = await response.json();
@@ -40,7 +43,8 @@ async function fetchWallets(): Promise<wallets[]> {
 
 export default function Reloads() {
     const [walletData, setData] = useState<wallets[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
+  const [authed, setAuthed] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
     const fetchData = async () => {
         try {
             const newData = await fetchWallets();
@@ -50,7 +54,17 @@ export default function Reloads() {
             console.error('Error fetching data:', error);
         }
     };
+    const checkAuth = async () => {
+        const authed = await App();
+        setAuthed(authed);
+        if (!authed) {
+          useUserStore.getState().resetUser();
+          useMsgStore.setState({ loginPage: "Please login to continue" });
+          window.location.href = "/auth/login";
+        }
+    }
     useEffect(() => {
+        checkAuth();
         fetchData(); // Fetch data on initial component mount
         setLoading(false);
     }, []);

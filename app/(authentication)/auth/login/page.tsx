@@ -1,10 +1,12 @@
 "use client";
 import * as z from "zod"
-import React from "react"
+import { useEffect } from "react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
+import { useToast } from "@/components/ui/use-toast"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useUserStore from "@/components/userStore";
+import { Auth } from '@/components/authCheck';
 import {
     Form,
     FormControl,
@@ -24,9 +26,10 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import useMsgStore from "@/components/msgStore";
 
 export default function login() {
-
+    const { toast } = useToast()
     const formSchema = z.object({
         name: z.string(),
         password: z.string()
@@ -40,7 +43,19 @@ export default function login() {
             name: "",
         }
     })
-
+    useEffect(() => {
+        const toToast = useMsgStore.getState().loginPage;
+        if (toToast != "") {
+            const timeout = setTimeout(() => {
+                toast({
+                    description: toToast,
+                })
+                useMsgStore.setState({ loginPage: "" });
+            }, 0)
+            return (() => clearTimeout(timeout))
+        }
+        
+    }, [toast])
     function onSubmit(values: z.infer<typeof formSchema>) {
         const vals = {
             name: values.name,
@@ -64,6 +79,9 @@ export default function login() {
         });
     }
 
+    if (!Auth()) {
+        window.location.href = "/app/spends";
+    }
     return (
         <main>
             <Card className="hover:glow-xl transition duration-300 py-5 px-5 justify-center">

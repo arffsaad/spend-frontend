@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import useMsgStore from "@/components/msgStore";
 
 
 export default function register() {
@@ -80,6 +81,7 @@ export default function register() {
                 throw new Error(response.statusText);
             }
             // redirect to spends page if successful
+            useMsgStore.setState({ loginPage: "Registration Success! Please Login." });
             window.location.href = "/auth/login";
         }).catch(error => {
             console.error(error);

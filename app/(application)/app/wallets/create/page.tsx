@@ -2,6 +2,7 @@
 
 import * as z from "zod"
 import { useEffect, useState } from "react"
+import { App } from '@/components/authCheck';
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -16,6 +17,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import useUserStore from "@/components/userStore";
+import useStore from "@/components/useStore";
+import useMsgStore from "@/components/msgStore";
 
 const formSchema = z.object({
     name: z.string()
@@ -40,6 +43,19 @@ const formSchema = z.object({
 
 
 export default function Page() {
+  const [authed, setAuthed] = useState<boolean>(false);
+  const checkAuth = async () => {
+    const authed = await App();
+    setAuthed(authed);
+    if (!authed) {
+      useUserStore.getState().resetUser();
+          useMsgStore.setState({ loginPage: "Please login to continue" });
+          window.location.href = "/auth/login";
+    }
+}
+useEffect(() => {
+  checkAuth();
+}, []);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -63,7 +79,7 @@ export default function Page() {
             }
         }).then(response => {
             if (response.status == 401) {
-                window.location.href = "/auth/login";
+                useStore(useUserStore, (state) => state.resetUser());
             }
             // redirect to spends page if successful
             window.location.href = "/app/wallets";

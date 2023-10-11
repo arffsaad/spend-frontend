@@ -44,6 +44,11 @@ export function setLoggedInUser(UserState: User) {
   useUserStore.setState(UserState)
 }
 
+export function Token() {
+  const token = useUserStore.getState().token;
+  return token;
+}
+
 export function getLoggedInUser() {
   const userState = {
     user: useUserStore.getState().user,
@@ -55,10 +60,10 @@ export function getLoggedInUser() {
 }
 
 export function resetLoggedInUser() {
-  useUserStore((state) => state.setEmail("undefined"))
+  useUserStore((state) => state.setEmail(""))
   useUserStore((state) => state.setId(0))
-  useUserStore((state) => state.setUser("undefined"))
-  useUserStore((state) => state.setToken("undefined"))
+  useUserStore((state) => state.setUser(""))
+  useUserStore((state) => state.setToken(""))
 }
 
 export default useUserStore;
