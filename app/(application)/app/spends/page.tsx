@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import useUserStore from '@/components/userStore';
 import useStore from '@/components/useStore';
 import { App } from '@/components/authCheck';
-import { set } from 'zod';
+import { useToast } from '@/components/ui/use-toast';
 import useMsgStore from '@/components/msgStore';
 
 
@@ -27,10 +27,11 @@ async function getData(): Promise<Spend[]> {
 }
 
 export default function Spends() {
+  const { toast } = useToast();
   const [data, setData] = useState<Spend[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [authed, setAuthed] = useState<boolean>(false);
-  const [hasWallets, setHasWallets] = useState<boolean>(false);
+  const [hasWallets, setHasWallets] = useState<boolean>(true);
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -42,7 +43,7 @@ export default function Spends() {
         }
       });
       await wallets.json().then((data) => {
-        if (data.length == 0) {
+        if (data.data.length == 0) {
           setHasWallets(false);
         } else {
           setHasWallets(true);
@@ -65,6 +66,19 @@ export default function Spends() {
     }
   }
   useEffect(() => {
+    const toToast = useMsgStore.getState().spendsPage;
+    if (toToast != "") {
+        const timeout = setTimeout(() => {
+            toast({
+                description: toToast,
+                variant: "destructive"
+            })
+            useMsgStore.setState({ spendsPage: "" });
+        }, 0)
+        return (() => clearTimeout(timeout))
+    }
+}, [toast, useMsgStore.getState().spendsPage])
+  useEffect(() => {
     checkAuth();
     fetchData(); // Fetch data on initial component mount
   }, []);
@@ -75,7 +89,7 @@ export default function Spends() {
       </Button>
       <br></br>
       <br></br>
-      <DataTable columns={columns} data={data} hasWallets={hasWallets}/>
+      <DataTable columns={columns} data={data} hasWallets={hasWallets} isLoading={isLoading}/>
     </main>
   );
 }

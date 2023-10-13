@@ -32,6 +32,7 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 import useUserStore from "@/components/userStore";
 import useStore from "@/components/useStore";
 import useMsgStore from "@/components/msgStore";
+import { useToast } from "@/components/ui/use-toast";
 
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
 
@@ -86,13 +87,14 @@ async function fetchWallets(): Promise<wallets[]> {
     }
 
     const data = await response.json();
-    return data;
+    return data.data;
 }
 
 
 export default function Page() {
     const [authed, setAuthed] = useState<boolean>(false);
     const [walletData, setData] = useState<wallets[]>([]);
+    const { toast } = useToast();
     const fetchData = async () => {
         try {
             const newData = await fetchWallets();
@@ -141,9 +143,16 @@ export default function Page() {
             headers: {
                 "Token": useUserStore.getState().token
             }
-        }).then(response => {
+        }).then(async response => {
+            const data = await response.json();
             if (response.status == 401) {
                 useStore(useUserStore, (state) => state.resetUser());
+            } else if (response.status != 201) {
+                toast({
+                    description: data.message,
+                    variant: "destructive"
+                })
+                throw new Error("Error creating spending");
             }
             // redirect to spends page if successful
             window.location.href = "/app/spends";

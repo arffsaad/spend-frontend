@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import useUserStore from '@/components/userStore';
 import useStore from '@/components/useStore';
 import useMsgStore from '@/components/msgStore';
+import { useToast } from '@/components/ui/use-toast';
 
 type Wallets = {
     id: number;
@@ -43,7 +44,7 @@ async function getData(id: number): Promise<Wallets> {
     }
 
     const data = await response.json();
-    return data;
+    return data.data;
 }
 
 export default function Wallet({ params }: { params: { id: number } }) {
@@ -52,6 +53,7 @@ export default function Wallet({ params }: { params: { id: number } }) {
   const [wallet, setWallet] = useState<Wallets>();
     const [reload, setReload] = useState<Reloads[]>([]);
     const [spend, setSpend] = useState<Spend[]>([]);
+    const { toast } = useToast();
     const fetchData = async () => {
         try {
             const newData = await getData(params.id);
@@ -72,6 +74,18 @@ export default function Wallet({ params }: { params: { id: number } }) {
           window.location.href = "/auth/login";
         }
     }
+    useEffect(() => {
+        const toToast = useMsgStore.getState().walletPage;
+        if (toToast != "") {
+            const timeout = setTimeout(() => {
+                toast({
+                    description: toToast
+                })
+                useMsgStore.setState({ walletPage: "" });
+            }, 0)
+            return (() => clearTimeout(timeout))
+        }
+    }, [toast, useMsgStore.getState().walletPage])
     useEffect(() => {
         checkAuth();
         fetchData(); // Fetch data on initial component mount

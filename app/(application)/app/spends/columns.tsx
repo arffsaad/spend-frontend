@@ -24,6 +24,7 @@ import {
 import { useState } from "react"
 import useUserStore from '@/components/userStore'
 import useStore from '@/components/useStore'
+import useMsgStore from '@/components/msgStore'
 
 
 // This type is used to define the shape of our data.
@@ -46,8 +47,11 @@ async function fulfillSpend(id: number) {
       "Token" : useUserStore.getState().token
     }
   });
+  const data = await response.json();
   if (response.status == 401) {
     useStore(useUserStore, (state) => state.resetUser());
+} else if (response.status != 200) {
+    useMsgStore.setState({ spendsPage: data.message });
 }
 }
 

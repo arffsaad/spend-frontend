@@ -70,7 +70,7 @@ async function fetchWallets(id : number): Promise<wallets> {
     }
 
     const data = await response.json();
-    return data;
+    return data.data;
 }
 
 
@@ -123,12 +123,15 @@ export default function Page({ params }: { params: { id: number } }) {
                 "Content-Type": "application/json",
                 "Token" : useUserStore.getState().token
             }
-        }).then(response => {
+        }).then(async response => {
+            const data = await response.json();
             if (response.status == 401) {
                 useStore(useUserStore, (state) => state.resetUser());
+            } else {
+                useMsgStore.setState({ walletPage: data.message });
+                window.location.href = "/app/wallets/" + walletData?.id;
             }
             // redirect to spends page if successful
-            window.location.href = "/app/wallets/" + walletData?.id;
         }).catch(error => {
             console.error(error);
         })

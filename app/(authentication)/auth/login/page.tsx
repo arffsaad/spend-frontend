@@ -1,6 +1,6 @@
 "use client";
 import * as z from "zod"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { useToast } from "@/components/ui/use-toast"
@@ -30,6 +30,7 @@ import useMsgStore from "@/components/msgStore";
 
 export default function login() {
     const { toast } = useToast()
+    const [loading, setLoading] = useState<boolean>(false);
     const formSchema = z.object({
         name: z.string(),
         password: z.string()
@@ -55,8 +56,9 @@ export default function login() {
             return (() => clearTimeout(timeout))
         }
         
-    }, [toast])
+    }, [toast, useMsgStore.getState().loginPage])
     function onSubmit(values: z.infer<typeof formSchema>) {
+        setLoading(true);
         const vals = {
             name: values.name,
             password: values.password,
@@ -68,14 +70,20 @@ export default function login() {
                 "Content-Type": "application/json"
             }
         }).then(async response => {
-            if (!response.ok) {
-                throw new Error(response.statusText);
-            }
             const data = await response.json();
-            useUserStore.setState(data);
+            if (!response.ok) {
+                setLoading(false);
+                toast({
+                    description: data.message,
+                    variant: "destructive"
+                })
+                throw new Error(data);
+            }
+            useUserStore.setState(data.data);
+            setLoading(false);
             window.location.href = "/app/spends";
         }).catch(error => {
-            console.error(error);
+            
         });
     }
 
@@ -127,7 +135,7 @@ export default function login() {
                                 )}
                             />
                             <br></br>
-                            <Button>Login</Button>
+                            <Button disabled={loading}>{loading ? (<><div className="mr-2 h-4 w-4 animate-spin"></div> Logging in...</>) : "Login"} </Button>
                         </CardContent>
                     </form>
                 </Form>

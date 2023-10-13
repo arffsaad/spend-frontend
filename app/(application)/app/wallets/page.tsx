@@ -38,7 +38,7 @@ async function fetchWallets(): Promise<wallets[]> {
     }
 
     const data = await response.json();
-    return data;
+    return data.data;
 }
 
 export default function Reloads() {
@@ -48,7 +48,6 @@ export default function Reloads() {
     const fetchData = async () => {
         try {
             const newData = await fetchWallets();
-            console.log(newData);
             setData(newData);
         } catch (error) {
             console.error('Error fetching data:', error);

@@ -20,12 +20,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   hasWallets: boolean
+  isLoading: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  hasWallets
+  hasWallets,
+  isLoading
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -77,7 +79,8 @@ export function DataTable<TData, TValue>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                { hasWallets ? "No Spending Data" : (<><Link href="/app/wallets/create"><u>Create</u></Link> your wallet to start!</>)}
+                { isLoading ? "Loading..." : hasWallets ? "No Spending Data" : (<><Link href="/app/wallets/create"><u>Create</u></Link> your wallet to start!</>)}
+                {/* { !hasWallets ? (<><Link href="/app/wallets/create"><u>Create</u></Link> your wallet to start!</>) : !isLoading ? "No Spending Data" : "Loading..."} */}
               </TableCell>
             </TableRow>
           )}

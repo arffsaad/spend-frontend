@@ -27,11 +27,14 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import useMsgStore from "@/components/msgStore";
+import { useToast } from "@/components/ui/use-toast";
 
 
 export default function register() {
     const [validName, setValidName] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const [namebadge, setNamebadge] = useState("");
+    const { toast } = useToast()
     const [username, setUsername] = useState("");
     const formSchema = z.object({
         name: z.string()
@@ -65,6 +68,7 @@ export default function register() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
+        setLoading(true);
         const vals = {
             name: values.name,
             email: values.email,
@@ -76,12 +80,18 @@ export default function register() {
             headers: {
                 "Content-Type": "application/json"
             }
-        }).then(response => {
+        }).then(async response => {
+            const data = await response.json();
             if (!response.ok) {
-                throw new Error(response.statusText);
+                setLoading(false);
+                toast({
+                    description: data.message,
+                    variant: "destructive"
+                })
+                throw new Error(data);
             }
-            // redirect to spends page if successful
             useMsgStore.setState({ loginPage: "Registration Success! Please Login." });
+            setLoading(false);
             window.location.href = "/auth/login";
         }).catch(error => {
             console.error(error);
