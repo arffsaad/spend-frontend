@@ -30,10 +30,6 @@ import useMsgStore from "@/components/msgStore";
 import { useToast } from "@/components/ui/use-toast";
 
 
-export const metadata: Metadata = {
-    title: 'Register',
-  }
-
 export default function register() {
     const [validName, setValidName] = useState(false);
     const [loading, setLoading] = useState<boolean>(false);
