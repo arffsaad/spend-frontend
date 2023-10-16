@@ -25,6 +25,7 @@ import { useState } from "react"
 import useUserStore from '@/components/userStore'
 import useStore from '@/components/useStore'
 import useMsgStore from '@/components/msgStore'
+import Image from 'next/image'
 
 
 // This type is used to define the shape of our data.
@@ -205,7 +206,7 @@ export const columns: ColumnDef<Spend>[] = [
             <DialogHeader>
               <DialogTitle>{row.getValue("remark")}</DialogTitle>
               <DialogDescription className="p-2">
-                <img src={"/cdn" + receipt} />
+                <Image alt={row.getValue("remark")} src={"/cdn" + receipt} />
               </DialogDescription>
             </DialogHeader>
           </DialogContent>
