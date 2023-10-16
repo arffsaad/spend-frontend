@@ -27,6 +27,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import useMsgStore from "@/components/msgStore";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: 'Home',
+  }
 
 export default function login() {
     const { toast } = useToast()
@@ -80,7 +85,6 @@ export default function login() {
                 throw new Error(data);
             }
             useUserStore.setState(data.data);
-            setLoading(false);
             window.location.href = "/app/spends";
         }).catch(error => {
             

@@ -71,7 +71,7 @@ export default function Spends() {
         const timeout = setTimeout(() => {
             toast({
                 description: toToast,
-                variant: "destructive"
+                variant: useMsgStore.getState().msgType == "error" ? "destructive" : "default"
             })
             useMsgStore.setState({ spendsPage: "" });
         }, 0)

@@ -1,5 +1,5 @@
 "use client";
-
+import { Metadata } from 'next'
 import * as z from "zod"
 import React from "react"
 import Link from "next/link"
@@ -29,6 +29,10 @@ import { Button } from "@/components/ui/button"
 import useMsgStore from "@/components/msgStore";
 import { useToast } from "@/components/ui/use-toast";
 
+
+export const metadata: Metadata = {
+    title: 'Register',
+  }
 
 export default function register() {
     const [validName, setValidName] = useState(false);

@@ -51,7 +51,9 @@ async function fulfillSpend(id: number) {
   if (response.status == 401) {
     useStore(useUserStore, (state) => state.resetUser());
 } else if (response.status != 200) {
-    useMsgStore.setState({ spendsPage: data.message });
+    useMsgStore.setState({ spendsPage: data.message, msgType: "error" });
+} else {
+    useMsgStore.setState({ spendsPage: data.message, msgType: "success" });
 }
 }
 
@@ -62,9 +64,14 @@ async function reverseSpend(id: number) {
       "Token" : useUserStore.getState().token
     }
   });
+  const data = await response.json();
   if (response.status == 401) {
-        useStore(useUserStore, (state) => state.resetUser());
-    }
+    useStore(useUserStore, (state) => state.resetUser());
+} else if (response.status != 200) {
+  useMsgStore.setState({ spendsPage: data.message, msgType: "error" });
+} else {
+  useMsgStore.setState({ spendsPage: data.message, msgType: "success" });
+}
 }
 
 export const columns: ColumnDef<Spend>[] = [

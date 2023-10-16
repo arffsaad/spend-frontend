@@ -153,6 +153,8 @@ export default function Page() {
                     variant: "destructive"
                 })
                 throw new Error("Error creating spending");
+            } else {
+                useMsgStore.setState({ spendsPage: data.message, msgType: "success" });
             }
             // redirect to spends page if successful
             window.location.href = "/app/spends";

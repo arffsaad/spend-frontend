@@ -110,7 +110,7 @@ export default function Wallet({ params }: { params: { id: number } }) {
                                         <span className="text-xl font-bold">{"RM " + (wallet.amount / 100).toFixed(2)}</span>
                                     )}
                                 </div>
-                                <div className={"mx-auto "+ (wallet && wallet.unfulfilledAmounts > 0 ?"text-red-500" : "")}>
+                                <div className={"mx-auto "+ (wallet && wallet.unfulfilledAmounts > 0 ?"text-red-500" : "text-green-500")}>
                                     <p className="text-sm">Unfulfilled:</p>
                                     {wallet && (
                                         <span className="text-xl font-bold ">{"RM " + (wallet.unfulfilledAmounts / 100).toFixed(2)}</span>
