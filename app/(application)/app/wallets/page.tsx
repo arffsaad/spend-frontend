@@ -112,7 +112,7 @@ export default function Reloads() {
                         :
                         (
                             walletData.map(walletItem => (
-                                <Link href={"/app/wallets/" + walletItem.id}>
+                                <Link key={walletItem.id} href={"/app/wallets/" + walletItem.id}>
                                     <Card className="hover:shadow-xl transition duration-300">
                                         <CardHeader>
                                             <CardTitle className="text-xl text-heavy">{walletItem.name}</CardTitle>

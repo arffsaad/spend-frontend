@@ -44,35 +44,35 @@ export type Spend = {
 async function fulfillSpend(id: number) {
   const response = await fetch("/api/spending/fulfill/" + id, {
     method: "POST",
-    headers : {
-      "Token" : useUserStore.getState().token
+    headers: {
+      "Token": useUserStore.getState().token
     }
   });
   const data = await response.json();
   if (response.status == 401) {
     useStore(useUserStore, (state) => state.resetUser());
-} else if (response.status != 200) {
+  } else if (response.status != 200) {
     useMsgStore.setState({ spendsPage: data.message, msgType: "error" });
-} else {
+  } else {
     useMsgStore.setState({ spendsPage: data.message, msgType: "success" });
-}
+  }
 }
 
 async function reverseSpend(id: number) {
   const response = await fetch("/api/spending/reverse/" + id, {
     method: "POST",
     headers: {
-      "Token" : useUserStore.getState().token
+      "Token": useUserStore.getState().token
     }
   });
   const data = await response.json();
   if (response.status == 401) {
     useStore(useUserStore, (state) => state.resetUser());
-} else if (response.status != 200) {
-  useMsgStore.setState({ spendsPage: data.message, msgType: "error" });
-} else {
-  useMsgStore.setState({ spendsPage: data.message, msgType: "success" });
-}
+  } else if (response.status != 200) {
+    useMsgStore.setState({ spendsPage: data.message, msgType: "error" });
+  } else {
+    useMsgStore.setState({ spendsPage: data.message, msgType: "success" });
+  }
 }
 
 export const columns: ColumnDef<Spend>[] = [
@@ -203,10 +203,12 @@ export const columns: ColumnDef<Spend>[] = [
         <Dialog>
           <DialogTrigger>View</DialogTrigger>
           <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{row.getValue("remark")}</DialogTitle>
-              <DialogDescription className="p-2">
-                <Image alt={row.getValue("remark")} src={"/cdn" + receipt} />
+            <DialogHeader >
+              <DialogTitle >{row.getValue("remark")}</DialogTitle>
+              <DialogDescription>
+                <div className='h-96 relative'>
+                  <Image alt={row.getValue("remark")} src={process.env.NEXT_PUBLIC_MINIO_HOST + "/spend-bucket" + receipt} fill/>
+                </div>
               </DialogDescription>
             </DialogHeader>
           </DialogContent>

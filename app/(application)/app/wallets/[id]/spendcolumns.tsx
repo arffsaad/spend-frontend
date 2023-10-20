@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { ColumnDef } from "@tanstack/react-table"
 import {
   Dialog,
@@ -42,24 +43,24 @@ async function fulfillSpend(id: number) {
   const response = await fetch("/api/spending/fulfill/" + id, {
     method: "POST",
     headers: {
-      "Token" : useUserStore.getState().token
+      "Token": useUserStore.getState().token
     }
   });
   if (response.status == 401) {
     useStore(useUserStore, (state) => state.resetUser());
-}
+  }
 }
 
 async function reverseSpend(id: number) {
   const response = await fetch("/api/spending/reverse/" + id, {
     method: "POST",
-    headers : {
-      "Token" : useUserStore.getState().token
+    headers: {
+      "Token": useUserStore.getState().token
     }
   });
   if (response.status == 401) {
     useStore(useUserStore, (state) => state.resetUser());
-}
+  }
 }
 
 export const spendColumns: ColumnDef<Spend>[] = [
@@ -109,7 +110,9 @@ export const spendColumns: ColumnDef<Spend>[] = [
             <DialogHeader>
               <DialogTitle>{row.getValue("remark")}</DialogTitle>
               <DialogDescription className="p-2">
-                <img src={"/cdn" + receipt} />
+                <div className='h-96 relative'>
+                  <Image alt={row.getValue("remark")} src={process.env.NEXT_PUBLIC_MINIO_HOST + "/spend-bucket" + receipt} fill />
+                </div>
               </DialogDescription>
             </DialogHeader>
           </DialogContent>

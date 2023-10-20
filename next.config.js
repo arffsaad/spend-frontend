@@ -4,17 +4,16 @@ const nextConfig = {
         return [
           {
             source: "/api/auth/:path*",
-            destination: "http://localhost:8080/api/auth/:path*",
+            destination: process.env.BACKEND_HOST + "/api/auth/:path*",
           },
           {
             source: "/api/:path*",
-            destination: "http://localhost:8080/api/v1/:path*",
+            destination: process.env.BACKEND_HOST + "/api/v1/:path*",
           },
-          {
-            source: "/cdn/:path*",
-            destination: "http://localhost:9000/spend-bucket/:path*",
-          }
         ];
+    },
+    images: {
+      domains: [(new URL(process.env.NEXT_PUBLIC_MINIO_HOST)).host],
     },
 }
 
