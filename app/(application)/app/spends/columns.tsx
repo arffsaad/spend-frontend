@@ -207,7 +207,7 @@ export const columns: ColumnDef<Spend>[] = [
               <DialogTitle >{row.getValue("remark")}</DialogTitle>
               <DialogDescription>
                 <div className='h-96 relative'>
-                  <Image alt={row.getValue("remark")} src={process.env.NEXT_PUBLIC_MINIO_HOST + "/spend-bucket" + receipt} fill/>
+                  <img alt={row.getValue("remark")} src={process.env.NEXT_PUBLIC_MINIO_HOST + "/spend-bucket" + receipt}/>
                 </div>
               </DialogDescription>
             </DialogHeader>
