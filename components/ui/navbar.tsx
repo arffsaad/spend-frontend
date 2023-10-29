@@ -13,10 +13,21 @@ import {
     NavigationMenuTrigger,
     NavigationMenuViewport,
 } from "@/components/ui/navigation-menu"
+import { useState, useEffect } from "react"
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
+import useUserStore from "../userStore";
+import useStore from "../useStore";
 
    
   export function Navbar() {
+    const username = useStore(useUserStore, (state) => state.user)
+    const[loading, setLoading] = useState<boolean>(true)
+    useEffect(() => {
+      // wait for a few seconds
+      setTimeout(() => {
+        setLoading(false)
+      }, 1000)
+    }, [])
     return (
       <nav className="p-5">
         <NavigationMenu>
@@ -28,6 +39,7 @@ import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
+            { loading ?  <></> : username == "" ? <></> : <>
             <NavigationMenuItem>
               <NavigationMenuTrigger>Spendings</NavigationMenuTrigger>
               <NavigationMenuContent>
@@ -53,7 +65,7 @@ import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
                   </ListItem>
                 </ul>
               </NavigationMenuContent>
-            </NavigationMenuItem>
+            </NavigationMenuItem></>}
           </NavigationMenuList>
         </NavigationMenu>
       </nav>
