@@ -132,7 +132,7 @@ export default function Page() {
     function onSubmit(values: z.infer<typeof formSchema>) {
         const vals = new FormData();
         vals.append("remark", values.name);
-        vals.append("amount", String(parseFloat(values.amount) * 100));
+        vals.append("amount", String(Math.round(parseFloat(values.amount) * 100)));
         vals.append("walletid", values.wallet);
         vals.append("fulfilled", values.fulfilled.toString());
         (values.image) ? vals.append("receipt", values.image[0]) : vals.append("receipt", "none");

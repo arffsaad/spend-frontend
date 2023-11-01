@@ -67,7 +67,7 @@ useEffect(() => {
     function onSubmit(values: z.infer<typeof formSchema>) {
         const vals = {
             name: values.name,
-            amount: parseFloat(values.amount) * 100,
+            amount: Math.round(parseFloat(values.amount) * 100),
             userid: 1
         }
         fetch("/api/wallets/create", {

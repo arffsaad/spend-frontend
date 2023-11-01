@@ -112,7 +112,7 @@ export default function Page({ params }: { params: { id: number } }) {
     function onSubmit(values: z.infer<typeof formSchema>) {
         const vals = {
             remark: values.name,
-            amount: parseFloat(values.amount) * 100,
+            amount: Math.round(parseFloat(values.amount) * 100),
             walletid: walletData?.id,
             userid: 1
         }
