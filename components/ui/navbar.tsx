@@ -50,6 +50,9 @@ import useStore from "../useStore";
                   <ListItem href="/app/spends/create" title="Add Spending">
                     Track a new spending
                   </ListItem>
+                  <ListItem href="#" title="Instalments">
+                    Track monthly Instalments (In dev)
+                  </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
