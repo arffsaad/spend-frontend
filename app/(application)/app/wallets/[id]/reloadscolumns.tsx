@@ -30,6 +30,11 @@ export const reloadColumns: ColumnDef<Reloads>[] = [
   },
   {
     accessorKey: "createdtime",
-    header: "Reload Time"
+    header: "Reload Time",
+    cell: ({ row }) => {
+      const datePaid = new Date(String(row.getValue("createdtime")));
+      const formatted = datePaid.toLocaleString('en-GB');
+      return <div className="text-left font-medium">{formatted}</div>
+    }
   },
 ]

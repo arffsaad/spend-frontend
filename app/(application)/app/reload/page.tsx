@@ -120,7 +120,6 @@ export default function Page() {
             remark: values.name,
             amount: Math.round(parseFloat(values.amount) * 100),
             walletid: parseInt(values.wallet),
-            userid: 1
         }
         fetch("/api/reloads/create", {
             method: "POST",

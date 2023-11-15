@@ -3,7 +3,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { AiFillPlusCircle } from "react-icons/ai"
 import { FaWallet } from "react-icons/fa";
 import { App } from '@/components/authCheck';
-import { BsPlusCircle } from "react-icons/bs";
+import { BsFillCalendar2WeekFill } from "react-icons/bs";
+import { FaExclamationTriangle } from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
+import { IconContext } from "react-icons";
 import Link from "next/link"
 import {
     Card,
@@ -23,6 +26,7 @@ type instalments = {
     amountDue: number;
     months: number;
     name: string;
+    monthly: number;
 }
 
 async function fetchWallets(): Promise<instalments[]> {
@@ -41,7 +45,7 @@ async function fetchWallets(): Promise<instalments[]> {
     return data.data;
 }
 
-export default function Reloads() {
+export default function Instalments() {
     const [instalmentsData, setData] = useState<instalments[]>([]);
   const [authed, setAuthed] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -115,17 +119,40 @@ export default function Reloads() {
                                 <Link key={item.id} href={"/app/instalments/" + item.id}>
                                     <Card className="hover:shadow-xl transition duration-300">
                                         <CardHeader>
-                                            <CardTitle className="text-xl text-heavy">{item.name}</CardTitle>
+                                            <div className="grid grid-cols-2">
+                                                <CardTitle className="text-xl text-heavy">{item.name}</CardTitle>
+                                                <div className="place-self-end pr-3">
+                                                    {(item.amountDue) > (2 * item.monthly) ? (
+                                                    <>
+                                                    <IconContext.Provider value={{ color: "red", className: "global-class-name" }}>
+                                                        <FaExclamationTriangle className="text-xl" />
+                                                    </IconContext.Provider>
+                                                    </>
+                                                    ) : (item.amountDue) > item.monthly ? (
+                                                    <>
+                                                    <IconContext.Provider value={{ color: "orange", className: "global-class-name" }}>
+                                                        <FaExclamationTriangle className="text-xl" />
+                                                    </IconContext.Provider>
+                                                    </>
+                                                    ) : (
+                                                    <>
+                                                    <IconContext.Provider value={{ color: "green", className: "global-class-name" }}>
+                                                        <FaCheckCircle className="text-xl" />
+                                                    </IconContext.Provider>
+                                                    </>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </CardHeader>
                                         <CardContent>
                                             <div className="grid grid-cols-2 xs:grid-cols-1">
                                                 <div>
                                                     <p className="text-sm">Balance:</p>
-                                                    <span className="text-xl font-bold">{"RM" + (item.amountLeft / 100).toFixed(2)}</span>
+                                                    <span className="text-xl font-bold">{"RM " + ((item.amountLeft / 100).toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</span>
                                                 </div>
                                                 <div>
                                                     <p className="text-sm">Due:</p>
-                                                    <span className="text-xl font-bold">{"RM" + (item.amountDue / 100).toFixed(2)}</span>
+                                                    <span className="text-xl font-bold">{"RM " + ((item.amountDue / 100).toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</span>
                                                 </div>
                                                 <div className="pt-5">
                                                     <p className="text-sm">Months left:</p>
@@ -140,10 +167,10 @@ export default function Reloads() {
                             )))
                 }
                 { loading ? (<></>) : (<>
-                <Link href="/app/wallets/create">
-                    <Card className="hover:shadow-xl transition duration-300 group">
+                <Link href="/app/instalments/create">
+                    <Card className="hover:shadow-xl transition duration-300 group pt-8 pb-9">
                         <CardHeader>
-                            <p className="font-medium text-5xl mx-auto pt-5 grid grid-cols-3"><BsPlusCircle className="scale-0 group-hover:scale-100 transition duration-300"/><AiFillPlusCircle className="group-hover:scale-0 transition duration-300 col-start-2"/><FaWallet className="scale-0 group-hover:scale-100 transition duration-300 col-start-3"/></p>
+                            <p className="font-medium text-5xl mx-auto pt-5 grid grid-cols-3"><BsFillCalendar2WeekFill className="scale-0 group-hover:scale-90 transition duration-300"/><AiFillPlusCircle className="group-hover:scale-0 transition duration-300 col-start-2"/><FaWallet className="scale-0 group-hover:scale-100 transition duration-300 col-start-3"/></p>
                             <p className="font-semibold mx-auto">Track an Instalment</p>
                         </CardHeader>
                         <CardFooter>

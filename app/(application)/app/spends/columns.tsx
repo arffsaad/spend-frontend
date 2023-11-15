@@ -117,8 +117,9 @@ export const columns: ColumnDef<Spend>[] = [
       if (fulfill == "null" || fulfill == null || fulfill == "") {
         return <div className="text-left font-medium">N/A</div>
       }
-
-      return <div className="text-left font-medium">{fulfill}</div>
+      const datePaid = new Date(String(row.getValue("fulfilled_at")));
+      const formatted = datePaid.toLocaleString('en-GB');
+      return <div className="text-left font-medium">{formatted}</div>
     },
   },
   {
