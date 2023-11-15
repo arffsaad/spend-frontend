@@ -218,7 +218,7 @@ export default function Instalment({ params }: { params: { id: number } }) {
                                                 <label htmlFor="wallet" className="text-sm font-bold">Wallet</label>
                                                 <select id="wallet" name="walletId" className="border border-gray-300 rounded-lg p-2">
                                                     {walletData.map(walletItem => (
-                                                        <option value={walletItem.id.toString()}>{walletItem.name}</option>
+                                                        <option key={walletItem.id} value={walletItem.id.toString()}>{walletItem.name}</option>
                                                     ))}
                                                 </select>
                                             </div>
